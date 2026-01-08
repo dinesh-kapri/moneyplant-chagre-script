@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charge & Invoice Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        .skeleton {
+            animation: shimmer 2s infinite;
+            background: linear-gradient(to right, #f0f0f0 4%, #e0e0e0 25%, #f0f0f0 36%);
+            background-size: 1000px 100%;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Charge & Invoice Manager</h1>
+            <p class="text-gray-600">Create and manage vendor charges and invoices</p>
+        </div>
+
+        <!-- Form Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6">Create New Charge</h2>
+            <form id="chargeForm" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Start Date -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Start Date *</label>
+                        <input type="date" id="startDate" required 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+
+                    <!-- End Date -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">End Date *</label>
+                        <input type="date" id="endDate" required 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+
+                    <!-- Vendor Code -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Vendor Code *</label>
+                        <input type="text" id="vendorCode" required placeholder="e.g., VENDOR0001139"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+
+                    <!-- State -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">State *</label>
+                        <select id="state" required 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select State</option>
+                            <option value="ANDHRA PRADESH">Andhra Pradesh</option>
+                            <option value="ARUNACHAL PRADESH">Arunachal Pradesh</option>
+                            <option value="ASSAM">Assam</option>
+                            <option value="BIHAR">Bihar</option>
+                            <option value="CHHATTISGARH">Chhattisgarh</option>
+                            <option value="GOA">Goa</option>
+                            <option value="GUJARAT">Gujarat</option>
+                            <option value="HARYANA">Haryana</option>
+                            <option value="HIMACHAL PRADESH">Himachal Pradesh</option>
+                            <option value="JHARKHAND">Jharkhand</option>
+                            <option value="KARNATAKA">Karnataka</option>
+                            <option value="KERALA">Kerala</option>
+                            <option value="MADHYA PRADESH">Madhya Pradesh</option>
+                            <option value="MAHARASHTRA">Maharashtra</option>
+                            <option value="MANIPUR">Manipur</option>
+                            <option value="MEGHALAYA">Meghalaya</option>
+                            <option value="MIZORAM">Mizoram</option>
+                            <option value="NAGALAND">Nagaland</option>
+                            <option value="ODISHA">Odisha</option>
+                            <option value="PUNJAB">Punjab</option>
+                            <option value="RAJASTHAN">Rajasthan</option>
+                            <option value="SIKKIM">Sikkim</option>
+                            <option value="TAMIL NADU">Tamil Nadu</option>
+                            <option value="TELANGANA">Telangana</option>
+                            <option value="TRIPURA">Tripura</option>
+                            <option value="UTTAR PRADESH">Uttar Pradesh</option>
+                            <option value="UTTARAKHAND">Uttarakhand</option>
+                            <option value="WEST BENGAL">West Bengal</option>
+                            <option value="NEW DELHI">New Delhi</option>
+                        </select>
+                    </div>
+
+                    <!-- Facility Code -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Facility Code *</label>
+                        <input type="text" id="facilityCode" required placeholder="e.g., INHRAHXW"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+
+                    <!-- Is Invoice Editable -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Invoice Editable *</label>
+                        <select id="invoiceEditable" required 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Option</option>
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+
+                    <!-- Amount -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Amount *</label>
+                        <input type="number" id="amount" step="0.01" required placeholder="e.g., 2500.00"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+
+                    <!-- External Charge ID -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">External Charge ID *</label>
+                        <input type="text" id="externalChargeId" required placeholder="e.g., INVOICEDINESHTEST21080"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+
+                    <!-- Invoice Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Invoice Name *</label>
+                        <input type="text" id="invoiceName" required placeholder="e.g., DINESH-RIYA 3"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+
+                    <!-- Charge Sub Type -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Charge Sub Type *</label>
+                        <select id="chargeSubType" required 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Type</option>
+                            <option value="SERVICE_CHARGE">Service Charge</option>
+                            <option value="ADJUSTMENT">Adjustment</option>
+                            <option value="PENALTY">Penalty</option>
+                        </select>
+                    </div>
+
+                    <!-- Bearer Token -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Bearer Token *</label>
+                        <input type="text" id="bearerToken" required placeholder="Enter your bearer token"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-4">
+                    <button type="submit" id="submitBtn"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition duration-200 flex items-center gap-2">
+                        <span>Create Charge</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Created Charge Card (Initially Hidden) -->
+        <div id="chargeCardContainer" class="hidden mb-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Created Charge</h2>
+            <div id="chargeCard" class="bg-white rounded-lg shadow-md p-6">
+                <!-- Skeleton Loader -->
+                <div id="chargeSkeleton" class="hidden space-y-3">
+                    <div class="skeleton h-6 w-3/4 rounded"></div>
+                    <div class="skeleton h-4 w-1/2 rounded"></div>
+                    <div class="skeleton h-4 w-2/3 rounded"></div>
+                    <div class="skeleton h-10 w-32 rounded mt-4"></div>
+                </div>
+
+                <!-- Actual Content -->
+                <div id="chargeContent" class="hidden">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-semibold text-gray-800" id="chargeTitle"></h3>
+                            <p class="text-sm text-gray-500 mt-1" id="chargeId"></p>
+                        </div>
+                        <span id="chargeStatus" class="px-3 py-1 rounded-full text-sm font-medium"></span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <p class="text-sm text-gray-600">Entity Code</p>
+                            <p class="font-medium" id="chargeEntityCode"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Amount</p>
+                            <p class="font-medium text-green-600" id="chargeAmount"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">State</p>
+                            <p class="font-medium" id="chargeState"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Facility Code</p>
+                            <p class="font-medium" id="chargeFacilityCode"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Sub Type</p>
+                            <p class="font-medium" id="chargeSubTypeDisplay"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">External Charge ID</p>
+                            <p class="font-medium" id="chargeExternalId"></p>
+                        </div>
+                    </div>
+
+                    <button id="approveChargeBtn"
+                        class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-lg transition duration-200 flex items-center gap-2">
+                        <span>Approve Charge</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Approval Levels Section -->
+        <div id="invoiceApprovalsContainer" class="hidden space-y-6">
+            <!-- Level 1: To be Approved by Vendor -->
+            <div id="level1Container" class="hidden">
+                <h2 class="text-xl font-semibold text-gray-800 mb-3">To be Approved by Vendor</h2>
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+                    <!-- Skeleton Loader -->
+                    <div id="level1Skeleton" class="hidden space-y-3">
+                        <div class="skeleton h-6 w-3/4 rounded"></div>
+                        <div class="skeleton h-4 w-1/2 rounded"></div>
+                        <div class="skeleton h-4 w-2/3 rounded"></div>
+                    </div>
+
+                    <!-- Level 1 Content -->
+                    <div id="level1Content" class="hidden">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800" id="level1Title"></h3>
+                                <p class="text-sm text-gray-500 mt-1" id="level1Id"></p>
+                            </div>
+                            <span id="level1Status" class="px-3 py-1 rounded-full text-sm font-medium"></span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <p class="text-sm text-gray-600">External Invoice ID</p>
+                                <p class="font-medium" id="level1ExternalId"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Amount</p>
+                                <p class="font-medium text-green-600" id="level1Amount"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Amount with Tax</p>
+                                <p class="font-medium text-blue-600" id="level1AmountWithTax"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Entity Code</p>
+                                <p class="font-medium" id="level1EntityCode"></p>
+                            </div>
+                        </div>
+
+                        <!-- Upload Form for L1 -->
+                        <div id="level1UploadForm" class="hidden border-t pt-6 mt-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Upload Invoice Document</h3>
+                            <form id="uploadForm" class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Sequence Number *</label>
+                                        <input type="text" id="sequenceNumber" required
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Encrypted GST Number *</label>
+                                        <input type="text" id="encryptedGst" required
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Invoice Date *</label>
+                                        <input type="date" id="invoiceDate" required
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">GST State *</label>
+                                        <select id="gstState" required 
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                            <option value="">Select State</option>
+                                            <option value="ANDHRA PRADESH">Andhra Pradesh</option>
+                                            <option value="ARUNACHAL PRADESH">Arunachal Pradesh</option>
+                                            <option value="ASSAM">Assam</option>
+                                            <option value="BIHAR">Bihar</option>
+                                            <option value="CHHATTISGARH">Chhattisgarh</option>
+                                            <option value="GOA">Goa</option>
+                                            <option value="GUJARAT">Gujarat</option>
+                                            <option value="HARYANA">Haryana</option>
+                                            <option value="HIMACHAL PRADESH">Himachal Pradesh</option>
+                                            <option value="JHARKHAND">Jharkhand</option>
+                                            <option value="KARNATAKA">Karnataka</option>
+                                            <option value="KERALA">Kerala</option>
+                                            <option value="MADHYA PRADESH">Madhya Pradesh</option>
+                                            <option value="MAHARASHTRA">Maharashtra</option>
+                                            <option value="MANIPUR">Manipur</option>
+                                            <option value="MEGHALAYA">Meghalaya</option>
+                                            <option value="MIZORAM">Mizoram</option>
+                                            <option value="NAGALAND">Nagaland</option>
+                                            <option value="ODISHA">Odisha</option>
+                                            <option value="PUNJAB">Punjab</option>
+                                            <option value="RAJASTHAN">Rajasthan</option>
+                                            <option value="SIKKIM">Sikkim</option>
+                                            <option value="TAMIL NADU">Tamil Nadu</option>
+                                            <option value="TELANGANA">Telangana</option>
+                                            <option value="TRIPURA">Tripura</option>
+                                            <option value="UTTAR PRADESH">Uttar Pradesh</option>
+                                            <option value="UTTARAKHAND">Uttarakhand</option>
+                                            <option value="WEST BENGAL">West Bengal</option>
+                                            <option value="NEW DELHI">New Delhi</option>
+                                        </select>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Upload File * (PDF, Max 2MB)</label>
+                                        <input type="file" id="invoiceFile" required accept="application/pdf"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <p class="text-xs text-gray-500 mt-1">Only PDF files less than 2MB are allowed</p>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Vendor Token *</label>
+                                        <input type="text" id="vendorToken" required placeholder="Enter vendor bearer token"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    </div>
+                                </div>
+                                <div class="flex justify-end">
+                                    <button type="submit" id="uploadSubmitBtn"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition duration-200 flex items-center gap-2">
+                                        <span>Upload & Submit</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level 2: To be Approved by HRBP -->
+            <div id="level2Container" class="hidden">
+                <h2 class="text-xl font-semibold text-gray-800 mb-3">To be Approved by HRBP</h2>
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
+                    <!-- Skeleton Loader -->
+                    <div id="level2Skeleton" class="hidden space-y-3">
+                        <div class="skeleton h-6 w-3/4 rounded"></div>
+                        <div class="skeleton h-4 w-1/2 rounded"></div>
+                        <div class="skeleton h-4 w-2/3 rounded"></div>
+                    </div>
+
+                    <!-- Level 2 Content -->
+                    <div id="level2Content" class="hidden">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800" id="level2Title"></h3>
+                                <p class="text-sm text-gray-500 mt-1" id="level2Id"></p>
+                            </div>
+                            <span id="level2Status" class="px-3 py-1 rounded-full text-sm font-medium"></span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <p class="text-sm text-gray-600">External Invoice ID</p>
+                                <p class="font-medium" id="level2ExternalId"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Amount</p>
+                                <p class="font-medium text-green-600" id="level2Amount"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Amount with Tax</p>
+                                <p class="font-medium text-blue-600" id="level2AmountWithTax"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Entity Code</p>
+                                <p class="font-medium" id="level2EntityCode"></p>
+                            </div>
+                        </div>
+
+                        <!-- Approve Button for L2 -->
+                        <div id="level2ApproveBtn" class="hidden">
+                            <button id="approveLevel2Btn"
+                                class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-lg transition duration-200">
+                                Approve Invoice
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level 3: To be Approved by Finance Manager -->
+            <div id="level3Container" class="hidden">
+                <h2 class="text-xl font-semibold text-gray-800 mb-3">To be Approved by Finance Manager</h2>
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                    <!-- Skeleton Loader -->
+                    <div id="level3Skeleton" class="hidden space-y-3">
+                        <div class="skeleton h-6 w-3/4 rounded"></div>
+                        <div class="skeleton h-4 w-1/2 rounded"></div>
+                        <div class="skeleton h-4 w-2/3 rounded"></div>
+                    </div>
+
+                    <!-- Level 3 Content -->
+                    <div id="level3Content" class="hidden">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800" id="level3Title"></h3>
+                                <p class="text-sm text-gray-500 mt-1" id="level3Id"></p>
+                            </div>
+                            <span id="level3Status" class="px-3 py-1 rounded-full text-sm font-medium"></span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <p class="text-sm text-gray-600">External Invoice ID</p>
+                                <p class="font-medium" id="level3ExternalId"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Amount</p>
+                                <p class="font-medium text-green-600" id="level3Amount"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Amount with Tax</p>
+                                <p class="font-medium text-blue-600" id="level3AmountWithTax"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Entity Code</p>
+                                <p class="font-medium" id="level3EntityCode"></p>
+                            </div>
+                        </div>
+
+                        <!-- Approve Button for L3 -->
+                        <div id="level3ApproveBtn" class="hidden">
+                            <button id="approveLevel3Btn"
+                                class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-lg transition duration-200">
+                                Approve Invoice
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="hidden fixed bottom-4 right-4 px-6 py-4 rounded-lg shadow-lg text-white font-medium z-50">
+            <p id="toastMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://hrms-dev-api-mum.delhivery.com/payouts/api/v1/OFR';
+        const VENDOR_API_BASE_URL = 'https://hrms-dev-api.delhivery.com/vendor/payouts/api/v1';
+        let currentChargeId = null;
+        let currentExternalInvoiceId = null;
+        let currentInvoiceId = null;
+        let currentInvoiceState = null;
+        let currentInvoiceData = null;
+        let bearerToken = null;
+        let vendorToken = null;
+        
+        // Store invoice history for each approval level
+        let invoiceHistory = {
+            level1: null,
+            level2: null,
+            level3: null
+        };
+
+        // Prevent accidental refresh
+        window.addEventListener('beforeunload', function (e) {
+            if (currentChargeId || currentInvoiceId) {
+                e.preventDefault();
+                e.returnValue = 'Data will be lost from the UI (not from backend) in case of refresh. Are you sure you want to reload?';
+                return e.returnValue;
+            }
+        });
+
+        // Utility Functions
+        function dateToEpoch(dateString) {
+            return Math.floor(new Date(dateString).getTime() / 1000);
+        }
+
+        function formatAmount(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR'
+            }).format(amount);
+        }
+
+        function showToast(message, type = 'success', duration = 3000) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            let bgColor = 'bg-green-600';
+            if (type === 'error') {
+                bgColor = 'bg-red-600';
+            } else if (type === 'info') {
+                bgColor = 'bg-blue-600';
+            }
+            
+            toast.className = `fixed bottom-4 right-4 px-6 py-4 rounded-lg shadow-lg text-white font-medium z-50 ${bgColor}`;
+            
+            toastMessage.textContent = message;
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, duration);
+        }
+
+        function showLoading(button) {
+            const originalText = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = `<div class="spinner"></div><span>Processing...</span>`;
+            return originalText;
+        }
+
+        function hideLoading(button, originalText) {
+            button.disabled = false;
+            button.innerHTML = originalText;
+        }
+
+        function generateRandomGroupName() {
+            const adjectives = ['alpha', 'beta', 'gamma', 'delta', 'omega'];
+            const nouns = ['group', 'team', 'squad', 'unit', 'batch'];
+            const random = Math.floor(Math.random() * 100);
+            return `${adjectives[Math.floor(Math.random() * adjectives.length)]}-${nouns[Math.floor(Math.random() * nouns.length)]}-${random}`;
+        }
+
+        // API Functions
+        async function createCharge(formData) {
+            const randomNum = Math.floor(Math.random() * 100) + 1;
+            const payload = {
+                cycle_start_date: formData.startDate,
+                cycle_end_date: formData.endDate,
+                entity_code: formData.vendorCode,
+                entity_type: "VENDOR",
+                sub_type: formData.chargeSubType,
+                address_state: formData.state,
+                facility_code: formData.facilityCode,
+                operational_type: "Retail",
+                is_gst_registered: true,
+                editable_invoice: formData.invoiceEditable,
+                payout_category: "DB",
+                type: "SALARY",
+                amount: formData.amount,
+                tax_amount: formData.amount * 0.18,
+                user_type: "OFR",
+                is_last_charge: formData.invoiceEditable,
+                invoice_id: formData.externalChargeId + randomNum,
+                external_charge_id: formData.externalChargeId,
+                additional_info: {
+                    create_invoice: true,
+                    group_name: generateRandomGroupName(),
+                    notes: "Urgent processing required",
+                    priority: "High",
+                    invoice_start_date: formData.startDate,
+                    invoice_end_date: formData.endDate,
+                    external_invoice_id: formData.externalChargeId,
+                    invoice_name: formData.invoiceName
+                },
+                description: "Monthly service",
+                tenant_id: "tenant_001"
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/charges`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${bearerToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    let errorMsg = 'Failed to create charge';
+                    try {
+                        const error = await response.json();
+                        errorMsg = error.error_message || error.message || `HTTP ${response.status}: ${response.statusText}`;
+                    } catch (e) {
+                        errorMsg = `HTTP ${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                return await response.json();
+            } catch (error) {
+                if (error.message) throw error;
+                throw new Error('Network error: Failed to create charge');
+            }
+        }
+
+        async function approveCharge(chargeId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/charges/${chargeId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${bearerToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: {
+                            action: "approve",
+                            current_state: "created"
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    let errorMsg = 'Failed to approve charge';
+                    try {
+                        const error = await response.json();
+                        errorMsg = error.error_message || error.message || `HTTP ${response.status}: ${response.statusText}`;
+                    } catch (e) {
+                        errorMsg = `HTTP ${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                return await response.json();
+            } catch (error) {
+                if (error.message) throw error;
+                throw new Error('Network error: Failed to approve charge');
+            }
+        }
+
+        async function createChargeDetails(chargeData, formData) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/charge-details`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${bearerToken}`
+                    },
+                    body: JSON.stringify({
+                        entity_code: formData.vendorCode,
+                        user_type: "OFR",
+                        entity_type: "VENDOR",
+                        charge_id: chargeData.id,
+                        cycle_start_date: formData.startDate,
+                        cycle_end_date: formData.endDate,
+                        amount: formData.amount,
+                        tax_amount: formData.amount * 0.18,
+                        description: "Storage charges for " + formData.invoiceName,
+                        additional_info: {
+                            center_code: formData.facilityCode,
+                            facility_code: formData.facilityCode,
+                            centre_name: "AUTOFC3",
+                            facility_name: "AUTOFC3",
+                            total_ctc: formData.amount,
+                            operation_type: "Delhivery-Warehouse",
+                            warehouse_location: formData.state,
+                            billing_period: "Q1-2024",
+                            square_footage: 5000,
+                            rate_per_sqft: 0.30
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    let errorMsg = 'Failed to create charge details';
+                    try {
+                        const error = await response.json();
+                        errorMsg = error.error_message || error.message || `HTTP ${response.status}: ${response.statusText}`;
+                    } catch (e) {
+                        errorMsg = `HTTP ${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                return await response.json();
+            } catch (error) {
+                if (error.message) throw error;
+                throw new Error('Network error: Failed to create charge details');
+            }
+        }
+
+        async function fetchInvoices() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/employee/invoices?page=1&view_type=all`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${bearerToken}`,
+                        'Accept': 'application/json, text/plain, */*'
+                    }
+                });
+
+                if (!response.ok) {
+                    let errorMsg = 'Failed to fetch invoices';
+                    try {
+                        const error = await response.json();
+                        errorMsg = error.error_message || error.message || `HTTP ${response.status}: ${response.statusText}`;
+                    } catch (e) {
+                        errorMsg = `HTTP ${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                return await response.json();
+            } catch (error) {
+                if (error.message) throw error;
+                throw new Error('Network error: Failed to fetch invoices');
+            }
+        }
+
+        async function getPresignedUrl(invoiceId, vendorToken) {
+            try {
+                const response = await fetch(`${VENDOR_API_BASE_URL}/files/presigned-url`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${vendorToken}`,
+                        'Content-Type': 'application/json',
+                        'Origin': 'https://manpower.delhivery.com'
+                    },
+                    body: JSON.stringify({
+                        upload_type: "uploaders",
+                        module: "invoices",
+                        id: invoiceId,
+                        content_type: "application/pdf",
+                        operation: "put_object"
+                    })
+                });
+
+                if (!response.ok) {
+                    let errorMsg = 'Failed to get presigned URL';
+                    try {
+                        const error = await response.json();
+                        errorMsg = error.error_message || error.message || `HTTP ${response.status}: ${response.statusText}`;
+                    } catch (e) {
+                        errorMsg = `HTTP ${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                return await response.json();
+            } catch (error) {
+                if (error.message) throw error;
+                throw new Error('Network error: Failed to get presigned URL');
+            }
+        }
+
+        async function uploadToS3(presignedUrl, file, contentType) {
+            try {
+                const response = await fetch(presignedUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': contentType
+                    },
+                    body: file
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to upload file to S3: ${response.status} ${response.statusText}`);
+                }
+
+                return response;
+            } catch (error) {
+                if (error.message) throw error;
+                throw new Error('Network error: Failed to upload file to S3');
+            }
+        }
+
+        async function updateSequenceNumber(invoiceId, s3Key, sequenceNumber, encryptedGst, invoiceDate, gstState, vendorToken) {
+            try {
+                const response = await fetch(`${VENDOR_API_BASE_URL}/OFR/vendor/invoices/${invoiceId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Accept': 'application/json, text/plain, */*',
+                        'Authorization': `Bearer ${vendorToken}`,
+                        'Content-Type': 'application/json',
+                        'Origin': 'https://manpower-dev-ui.pntrzz.com',
+                        'Referer': 'https://manpower-dev-ui.pntrzz.com/'
+                    },
+                    body: JSON.stringify({
+                        s3_file_path: s3Key,
+                        sequence_number: String(sequenceNumber),
+                        encrypted_gst_number: "5794200a-0c41-dc05-f4e6-56ad8f63f067-31",
+                        invoice_date: invoiceDate,
+                        vendor_selected_state: "Haryana"
+                    })
+                });
+
+                if (!response.ok) {
+                    let errorMsg = 'Failed to update sequence number';
+                    try {
+                        const error = await response.json();
+                        errorMsg = error.error_message || error.message || `HTTP ${response.status}: ${response.statusText}`;
+                    } catch (e) {
+                        errorMsg = `HTTP ${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                return await response.json();
+            } catch (error) {
+                if (error.message) throw error;
+                throw new Error('Network error: Failed to update sequence number');
+            }
+        }
+
+        async function approveInvoice(invoiceId, currentState) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/invoices/${invoiceId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${bearerToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: {
+                            action: "approve",
+                            current_state: currentState
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    let errorMsg = 'Failed to approve invoice';
+                    try {
+                        const error = await response.json();
+                        errorMsg = error.error_message || error.message || `HTTP ${response.status}: ${response.statusText}`;
+                    } catch (e) {
+                        errorMsg = `HTTP ${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                return await response.json();
+            } catch (error) {
+                if (error.message) throw error;
+                throw new Error('Network error: Failed to approve invoice');
+            }
+        }
+
+        // Display Functions
+        function displayCharge(chargeData) {
+            const container = document.getElementById('chargeCardContainer');
+            const skeleton = document.getElementById('chargeSkeleton');
+            const content = document.getElementById('chargeContent');
+
+            container.classList.remove('hidden');
+            skeleton.classList.add('hidden');
+            content.classList.remove('hidden');
+
+            document.getElementById('chargeTitle').textContent = chargeData.additional_info.invoice_name;
+            document.getElementById('chargeId').textContent = `ID: ${chargeData.id}`;
+            document.getElementById('chargeEntityCode').textContent = chargeData.entity_code;
+            document.getElementById('chargeAmount').textContent = formatAmount(chargeData.amount);
+            document.getElementById('chargeState').textContent = chargeData.address_state;
+            document.getElementById('chargeFacilityCode').textContent = chargeData.facility_code;
+            document.getElementById('chargeSubTypeDisplay').textContent = chargeData.sub_type.replace('_', ' ');
+            document.getElementById('chargeExternalId').textContent = chargeData.external_charge_id;
+
+            const statusBadge = document.getElementById('chargeStatus');
+            statusBadge.textContent = chargeData.state.toUpperCase();
+            statusBadge.className = `px-3 py-1 rounded-full text-sm font-medium ${
+                chargeData.state === 'created' ? 'bg-yellow-100 text-yellow-800' :
+                chargeData.state === 'approved' ? 'bg-green-100 text-green-800' :
+                'bg-gray-100 text-gray-800'
+            }`;
+
+            currentChargeId = chargeData.id;
+            currentExternalInvoiceId = chargeData.external_charge_id;
+        }
+
+        function displayInvoice(invoiceData) {
+            // Store current invoice data
+            currentInvoiceId = invoiceData.id;
+            currentInvoiceState = invoiceData.state;
+            currentInvoiceData = invoiceData;
+
+            const state = invoiceData.state.toLowerCase();
+            const container = document.getElementById('invoiceApprovalsContainer');
+            container.classList.remove('hidden');
+
+            // Determine which level to display based on state
+            if (state === 'processing:l1_pending') {
+                displayLevel1(invoiceData, true);
+            } else if (state === 'processing:l2_pending') {
+                // Show L1 as approved and L2 as pending
+                if (invoiceHistory.level1) {
+                    displayLevel1(invoiceHistory.level1, false);
+                }
+                displayLevel2(invoiceData, true);
+            } else if (state === 'processing:l3_pending') {
+                // Show L1 and L2 as approved, L3 as pending
+                if (invoiceHistory.level1) {
+                    displayLevel1(invoiceHistory.level1, false);
+                }
+                if (invoiceHistory.level2) {
+                    displayLevel2(invoiceHistory.level2, false);
+                }
+                displayLevel3(invoiceData, true);
+            } else if (state === 'approved') {
+                // Show all levels as approved
+                if (invoiceHistory.level1) {
+                    displayLevel1(invoiceHistory.level1, false);
+                }
+                if (invoiceHistory.level2) {
+                    displayLevel2(invoiceHistory.level2, false);
+                }
+                if (invoiceHistory.level3) {
+                    displayLevel3(invoiceHistory.level3, false);
+                }
+            }
+        }
+
+        function displayLevel1(invoiceData, showActions) {
+            const container = document.getElementById('level1Container');
+            const skeleton = document.getElementById('level1Skeleton');
+            const content = document.getElementById('level1Content');
+            const uploadForm = document.getElementById('level1UploadForm');
+
+            container.classList.remove('hidden');
+            skeleton.classList.add('hidden');
+            content.classList.remove('hidden');
+
+            document.getElementById('level1Title').textContent = invoiceData.name;
+            document.getElementById('level1Id').textContent = `ID: ${invoiceData.id}`;
+            document.getElementById('level1ExternalId').textContent = invoiceData.external_invoice_id;
+            document.getElementById('level1Amount').textContent = formatAmount(invoiceData.amount);
+            document.getElementById('level1AmountWithTax').textContent = formatAmount(invoiceData.amount_with_tax);
+            document.getElementById('level1EntityCode').textContent = invoiceData.entity_code;
+
+            const statusBadge = document.getElementById('level1Status');
+            if (showActions) {
+                statusBadge.textContent = 'processing:l1_pending'.toUpperCase();
+                statusBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800';
+                uploadForm.classList.remove('hidden');
+            } else {
+                statusBadge.textContent = 'APPROVED';
+                statusBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800';
+                uploadForm.classList.add('hidden');
+            }
+        }
+
+        function displayLevel2(invoiceData, showActions) {
+            const container = document.getElementById('level2Container');
+            const skeleton = document.getElementById('level2Skeleton');
+            const content = document.getElementById('level2Content');
+            const approveBtn = document.getElementById('level2ApproveBtn');
+
+            container.classList.remove('hidden');
+            skeleton.classList.add('hidden');
+            content.classList.remove('hidden');
+
+            document.getElementById('level2Title').textContent = invoiceData.name;
+            document.getElementById('level2Id').textContent = `ID: ${invoiceData.id}`;
+            document.getElementById('level2ExternalId').textContent = invoiceData.external_invoice_id;
+            document.getElementById('level2Amount').textContent = formatAmount(invoiceData.amount);
+            document.getElementById('level2AmountWithTax').textContent = formatAmount(invoiceData.amount_with_tax);
+            document.getElementById('level2EntityCode').textContent = invoiceData.entity_code;
+
+            const statusBadge = document.getElementById('level2Status');
+            if (showActions) {
+                statusBadge.textContent = 'processing:l2_pending'.toUpperCase();
+                statusBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800';
+                approveBtn.classList.remove('hidden');
+            } else {
+                statusBadge.textContent = 'APPROVED';
+                statusBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800';
+                approveBtn.classList.add('hidden');
+            }
+        }
+
+        function displayLevel3(invoiceData, showActions) {
+            const container = document.getElementById('level3Container');
+            const skeleton = document.getElementById('level3Skeleton');
+            const content = document.getElementById('level3Content');
+            const approveBtn = document.getElementById('level3ApproveBtn');
+
+            container.classList.remove('hidden');
+            skeleton.classList.add('hidden');
+            content.classList.remove('hidden');
+
+            document.getElementById('level3Title').textContent = invoiceData.name;
+            document.getElementById('level3Id').textContent = `ID: ${invoiceData.id}`;
+            document.getElementById('level3ExternalId').textContent = invoiceData.external_invoice_id;
+            document.getElementById('level3Amount').textContent = formatAmount(invoiceData.amount);
+            document.getElementById('level3AmountWithTax').textContent = formatAmount(invoiceData.amount_with_tax);
+            document.getElementById('level3EntityCode').textContent = invoiceData.entity_code;
+
+            const statusBadge = document.getElementById('level3Status');
+            if (showActions) {
+                statusBadge.textContent = 'processing:l3_pending'.toUpperCase();
+                statusBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800';
+                approveBtn.classList.remove('hidden');
+            } else {
+                statusBadge.textContent = 'APPROVED';
+                statusBadge.className = 'px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800';
+                approveBtn.classList.add('hidden');
+            }
+        }
+
+        function showLevel1Skeleton() {
+            const container = document.getElementById('level1Container');
+            const skeleton = document.getElementById('level1Skeleton');
+            const content = document.getElementById('level1Content');
+            
+            container.classList.remove('hidden');
+            skeleton.classList.remove('hidden');
+            content.classList.add('hidden');
+        }
+
+        function showLevel2Skeleton() {
+            const container = document.getElementById('level2Container');
+            const skeleton = document.getElementById('level2Skeleton');
+            const content = document.getElementById('level2Content');
+            
+            container.classList.remove('hidden');
+            skeleton.classList.remove('hidden');
+            content.classList.add('hidden');
+        }
+
+        function showLevel3Skeleton() {
+            const container = document.getElementById('level3Container');
+            const skeleton = document.getElementById('level3Skeleton');
+            const content = document.getElementById('level3Content');
+            
+            container.classList.remove('hidden');
+            skeleton.classList.remove('hidden');
+            content.classList.add('hidden');
+        }
+
+        function showChargeSkeleton() {
+            const container = document.getElementById('chargeCardContainer');
+            const skeleton = document.getElementById('chargeSkeleton');
+            const content = document.getElementById('chargeContent');
+
+            container.classList.remove('hidden');
+            skeleton.classList.remove('hidden');
+            content.classList.add('hidden');
+        }
+
+        // Event Handlers
+        document.getElementById('chargeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = showLoading(submitBtn);
+
+            try {
+                bearerToken = document.getElementById('bearerToken').value;
+
+                const formData = {
+                    startDate: dateToEpoch(document.getElementById('startDate').value),
+                    endDate: dateToEpoch(document.getElementById('endDate').value),
+                    vendorCode: document.getElementById('vendorCode').value,
+                    state: document.getElementById('state').value,
+                    facilityCode: document.getElementById('facilityCode').value,
+                    invoiceEditable: document.getElementById('invoiceEditable').value === 'true',
+                    amount: parseFloat(document.getElementById('amount').value),
+                    externalChargeId: document.getElementById('externalChargeId').value,
+                    invoiceName: document.getElementById('invoiceName').value,
+                    chargeSubType: document.getElementById('chargeSubType').value
+                };
+
+                showChargeSkeleton();
+
+                const response = await createCharge(formData);
+                
+                if (response.data) {
+                    showToast('Charge created! Creating charge details...', 'info', 2000);
+                    
+                    // Create charge details
+                    try {
+                        await createChargeDetails(response.data, formData);
+                        showToast('Charge and charge details created successfully!');
+                    } catch (detailsError) {
+                        // Show charge even if details creation fails
+                        showToast('Charge created but failed to create details: ' + detailsError.message, 'error');
+                    }
+                    
+                    displayCharge(response.data);
+                } else {
+                    throw new Error('No data received from API');
+                }
+            } catch (error) {
+                showToast(error.message, 'error');
+                document.getElementById('chargeCardContainer').classList.add('hidden');
+            } finally {
+                hideLoading(submitBtn, originalText);
+            }
+        });
+
+        document.getElementById('approveChargeBtn').addEventListener('click', async () => {
+            if (!currentChargeId) return;
+
+            const approveBtn = document.getElementById('approveChargeBtn');
+            const originalText = showLoading(approveBtn);
+
+            try {
+                await approveCharge(currentChargeId);
+                
+                // Update charge status
+                document.getElementById('chargeStatus').textContent = 'APPROVED';
+                document.getElementById('chargeStatus').className = 'px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800';
+                
+                showToast('Charge approved successfully!');
+
+                // Wait a bit then fetch invoices
+                document.getElementById('invoiceApprovalsContainer').classList.remove('hidden');
+                showLevel1Skeleton();
+                
+                setTimeout(async () => {
+                    try {
+                        const invoicesResponse = await fetchInvoices();
+                        
+                        if (invoicesResponse.data && invoicesResponse.data.items) {
+                            const matchingInvoice = invoicesResponse.data.items.find(
+                                invoice => invoice.external_invoice_id === currentExternalInvoiceId
+                            );
+
+                            if (matchingInvoice) {
+                                displayInvoice(matchingInvoice);
+                                showToast('Invoice found and displayed!');
+                            } else {
+                                showToast('Invoice not found yet. Please wait and try again.', 'error');
+                                document.getElementById('invoiceApprovalsContainer').classList.add('hidden');
+                            }
+                        }
+                    } catch (error) {
+                        showToast('Failed to fetch invoices: ' + error.message, 'error');
+                        document.getElementById('invoiceApprovalsContainer').classList.add('hidden');
+                    }
+                }, 2000);
+
+            } catch (error) {
+                showToast('Failed to approve charge: ' + error.message, 'error');
+            } finally {
+                hideLoading(approveBtn, originalText);
+            }
+        });
+
+        // Upload Form Handler
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('uploadSubmitBtn');
+            const originalText = showLoading(submitBtn);
+
+            try {
+                // Get form values
+                const sequenceNumber = document.getElementById('sequenceNumber').value;
+                const encryptedGst = document.getElementById('encryptedGst').value;
+                const invoiceDate = dateToEpoch(document.getElementById('invoiceDate').value);
+                const gstState = document.getElementById('gstState').value;
+                const fileInput = document.getElementById('invoiceFile');
+                vendorToken = document.getElementById('vendorToken').value;
+
+                // Validate file
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    throw new Error('Please select a file to upload');
+                }
+
+                const file = fileInput.files[0];
+                
+                // Check file size (2MB = 2 * 1024 * 1024 bytes)
+                if (file.size > 2 * 1024 * 1024) {
+                    throw new Error('File size must be less than 2MB');
+                }
+
+                // Check file type
+                if (file.type !== 'application/pdf') {
+                    throw new Error('Only PDF files are allowed');
+                }
+
+                // Step 1: Get presigned URL
+                showToast('Step 1/4: Getting upload URL...', 'info', 2000);
+                const presignedResponse = await getPresignedUrl(currentInvoiceId, vendorToken);
+                
+                if (!presignedResponse.data || !presignedResponse.data.url) {
+                    throw new Error('Failed to get upload URL');
+                }
+
+                const { url: presignedUrl, key: s3Key, content_type } = presignedResponse.data;
+
+                // Step 2: Upload file to S3
+                showToast('Step 2/4: Uploading file to S3...', 'info', 2000);
+                await uploadToS3(presignedUrl, file, content_type);
+
+                // Step 3: Update sequence number
+                showToast('Step 3/4: Updating invoice details...', 'info', 2000);
+                await updateSequenceNumber(
+                    currentInvoiceId,
+                    s3Key,
+                    sequenceNumber,
+                    encryptedGst,
+                    invoiceDate,
+                    gstState,
+                    vendorToken
+                );
+
+                showToast('Step 4/4: Fetching updated invoice...', 'info', 2000);
+
+                // Save L1 data to history before fetching updated data
+                invoiceHistory.level1 = { ...currentInvoiceData };
+
+                // Step 4: Fetch updated invoice data
+                showLevel2Skeleton();
+                setTimeout(async () => {
+                    try {
+                        const invoicesResponse = await fetchInvoices();
+                        
+                        if (invoicesResponse.data && invoicesResponse.data.items) {
+                            const matchingInvoice = invoicesResponse.data.items.find(
+                                invoice => invoice.id === currentInvoiceId
+                            );
+
+                            if (matchingInvoice) {
+                                displayInvoice(matchingInvoice);
+                                showToast('Invoice updated to L2!', 'success');
+                            } else {
+                                showToast('Invoice not found in updated data', 'error');
+                            }
+                        }
+                    } catch (error) {
+                        showToast('Failed to refresh invoice: ' + error.message, 'error');
+                    }
+                }, 2000);
+
+            } catch (error) {
+                showToast(error.message, 'error');
+            } finally {
+                hideLoading(submitBtn, originalText);
+            }
+        });
+
+        // File input validation
+        document.getElementById('invoiceFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 2 * 1024 * 1024) {
+                    showToast('File size must be less than 2MB', 'error');
+                    e.target.value = '';
+                } else if (file.type !== 'application/pdf') {
+                    showToast('Only PDF files are allowed', 'error');
+                    e.target.value = '';
+                }
+            }
+        });
+
+        // Approve Level 2 Handler
+        document.getElementById('approveLevel2Btn').addEventListener('click', async () => {
+            if (!currentInvoiceId || !currentInvoiceState) {
+                showToast('No invoice selected', 'error');
+                return;
+            }
+
+            const approveBtn = document.getElementById('approveLevel2Btn');
+            const originalText = showLoading(approveBtn);
+
+            try {
+                await approveInvoice(currentInvoiceId, currentInvoiceState);
+                showToast('Level 2 approved successfully!', 'success');
+
+                // Save L2 data to history
+                invoiceHistory.level2 = { ...currentInvoiceData };
+
+                // Fetch updated invoice data
+                showLevel3Skeleton();
+                
+                setTimeout(async () => {
+                    try {
+                        const invoicesResponse = await fetchInvoices();
+                        
+                        if (invoicesResponse.data && invoicesResponse.data.items) {
+                            const matchingInvoice = invoicesResponse.data.items.find(
+                                invoice => invoice.id === currentInvoiceId
+                            );
+
+                            if (matchingInvoice) {
+                                displayInvoice(matchingInvoice);
+                                showToast('Invoice updated to L3!', 'success');
+                            } else {
+                                showToast('Invoice not found in updated data', 'error');
+                            }
+                        }
+                    } catch (error) {
+                        showToast('Failed to refresh invoice: ' + error.message, 'error');
+                    }
+                }, 2000);
+
+            } catch (error) {
+                showToast('Failed to approve Level 2: ' + error.message, 'error');
+            } finally {
+                hideLoading(approveBtn, originalText);
+            }
+        });
+
+        // Approve Level 3 Handler
+        document.getElementById('approveLevel3Btn').addEventListener('click', async () => {
+            if (!currentInvoiceId || !currentInvoiceState) {
+                showToast('No invoice selected', 'error');
+                return;
+            }
+
+            const approveBtn = document.getElementById('approveLevel3Btn');
+            const originalText = showLoading(approveBtn);
+
+            try {
+                await approveInvoice(currentInvoiceId, currentInvoiceState);
+                showToast('Level 3 approved successfully!', 'success');
+
+                // Save L3 data to history
+                invoiceHistory.level3 = { ...currentInvoiceData };
+
+                // Fetch updated invoice data to show final approved state
+                setTimeout(async () => {
+                    try {
+                        const invoicesResponse = await fetchInvoices();
+                        
+                        if (invoicesResponse.data && invoicesResponse.data.items) {
+                            const matchingInvoice = invoicesResponse.data.items.find(
+                                invoice => invoice.id === currentInvoiceId
+                            );
+
+                            if (matchingInvoice) {
+                                // Update L3 to show approved
+                                displayInvoice(matchingInvoice);
+                                showToast('All levels approved! Invoice complete.', 'success');
+                            } else {
+                                // Just mark L3 as approved
+                                displayLevel3(currentInvoiceData, false);
+                                showToast('All levels approved! Invoice complete.', 'success');
+                            }
+                        }
+                    } catch (error) {
+                        // Even if fetch fails, mark L3 as approved
+                        displayLevel3(currentInvoiceData, false);
+                        showToast('All levels approved! Invoice complete.', 'success');
+                    }
+                }, 2000);
+
+            } catch (error) {
+                showToast('Failed to approve Level 3: ' + error.message, 'error');
+            } finally {
+                hideLoading(approveBtn, originalText);
+            }
+        });
+    </script>
+</body>
+</html>
+
