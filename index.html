@@ -98,6 +98,7 @@
                             <option value="UTTARAKHAND">Uttarakhand</option>
                             <option value="WEST BENGAL">West Bengal</option>
                             <option value="NEW DELHI">New Delhi</option>
+                            <option value="Delhi">Delhi</option>
                         </select>
                     </div>
 
@@ -105,6 +106,13 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Facility Code *</label>
                         <input type="text" id="facilityCode" required placeholder="e.g., INHRAHXW"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+
+                    <!-- Facility Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Facility Name *</label>
+                        <input type="text" id="facilityName" required placeholder="e.g., AUTOFC3"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
 
@@ -322,6 +330,7 @@
                                             <option value="UTTARAKHAND">Uttarakhand</option>
                                             <option value="WEST BENGAL">West Bengal</option>
                                             <option value="NEW DELHI">New Delhi</option>
+                                            <option value="Delhi">Delhi</option>
                                         </select>
                                     </div>
                                     <div class="md:col-span-2">
@@ -655,8 +664,8 @@
                         additional_info: {
                             center_code: formData.facilityCode,
                             facility_code: formData.facilityCode,
-                            centre_name: "AUTOFC3",
-                            facility_name: "AUTOFC3",
+                            centre_name: formData.facilityName,
+                            facility_name: formData.facilityName,
                             total_ctc: formData.amount,
                             operation_type: "Delhivery-Warehouse",
                             warehouse_location: formData.state,
@@ -1058,6 +1067,7 @@
                     vendorCode: document.getElementById('vendorCode').value,
                     state: document.getElementById('state').value,
                     facilityCode: document.getElementById('facilityCode').value,
+                    facilityName: document.getElementById('facilityName').value,
                     invoiceEditable: document.getElementById('invoiceEditable').value === 'true',
                     amount: parseFloat(document.getElementById('amount').value),
                     externalChargeId: document.getElementById('externalChargeId').value,
