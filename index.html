@@ -793,9 +793,9 @@
                     body: JSON.stringify({
                         s3_file_path: s3Key,
                         sequence_number: String(sequenceNumber),
-                        encrypted_gst_number: "5794200a-0c41-dc05-f4e6-56ad8f63f067-31",
+                        encrypted_gst_number: encryptedGst,
                         invoice_date: invoiceDate,
-                        vendor_selected_state: "Haryana"
+                        vendor_selected_state: gstState
                     })
                 });
 
